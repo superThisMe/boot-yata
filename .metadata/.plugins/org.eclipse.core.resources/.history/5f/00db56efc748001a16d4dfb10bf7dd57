@@ -1,0 +1,5 @@
+package com.yata.config;
+
+public class DatabaseConfig {
+
+}
