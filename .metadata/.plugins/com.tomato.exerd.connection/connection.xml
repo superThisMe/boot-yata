@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+  <connection>
+    <productId>com.tomato.db.oracle_10g</productId>
+    <productName>Oracle 9i ~ 12c</productName>
+    <name>yata-server</name>
+    <driverJar>C:\workspace\dev-tools\jdbc driver\ojdbc6.jar</driverJar>
+    <driverClass>oracle.jdbc.OracleDriver</driverClass>
+    <url>jdbc:oracle:thin:@211.197.18.246:1551:xe</url>
+    <properties>
+      <user>yata</user>
+      <port>1551</port>
+      <password>dixk8080</password>
+      <sId>xe</sId>
+      <host>211.197.18.246</host>
+      <internal_logon>normal</internal_logon>
+    </properties>
+    <extendedProperties>
+      <connectionString />
+    </extendedProperties>
+  </connection>
+  <connection>
+    <productId>com.tomato.db.oracle_10g</productId>
+    <productName>Oracle 9i ~ 12c</productName>
+    <name>yata-local</name>
+    <driverJar>C:\workspace\dev-tools\jdbc driver\ojdbc6.jar</driverJar>
+    <driverClass>oracle.jdbc.OracleDriver</driverClass>
+    <url>jdbc:oracle:thin:@localhost:1521:xe</url>
+    <properties>
+      <user>yata</user>
+      <port>1521</port>
+      <password>9922</password>
+      <sId>xe</sId>
+      <host>localhost</host>
+      <internal_logon>normal</internal_logon>
+    </properties>
+    <extendedProperties>
+      <connectionString />
+    </extendedProperties>
+  </connection>
+</database>
+

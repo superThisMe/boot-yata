@@ -96,7 +96,7 @@
                     <!--== Logo Start ==-->
                     <div class="col-lg-4">
                         <a href="index2.html" class="logo">
-                            YaTa!!
+                            <span style="font-size: 40px">YaTa</span>
                         </a>
                     </div>
                     <!--== Logo End ==-->
@@ -105,10 +105,8 @@
                     <div class="col-lg-8 d-none d-xl-block">
                         <nav class="mainmenu alignright">
                             <ul>
-                                <li><a href="/">Home</a></li>
-                                <li><a href="about.html">About</a></li>
-                                <li><a href="services.html">services</a></li>
-                                <li><a href="#">Cars</a>
+                                <li><a href="/">홈</a></li>
+                                <li><a href="#">차량</a>
                                     <ul>
                                         <li><a href="car-left-sidebar.html">Car Left Sidebar</a></li>
                                         <li><a href="car-right-sidebar.html">Car Right Sidebar</a></li>
@@ -116,32 +114,34 @@
                                         <li><a href="car-details.html">Car Details</a></li>
                                     </ul>
                                 </li>
-                                <li><a href="index.html">Pages</a>
-                                    <ul>
-                                        <li><a href="package.html">Pricing</a></li>
-                                        <li><a href="driver.html">Driver</a></li>
-                                        <li><a href="faq.html">FAQ</a></li>
-                                        <li><a href="gallery.html">Gallery</a></li>
-                                        <li><a href="help-desk.html">Help Desk</a></li>
-                                        <li><a href="login.html">Log In</a></li>
-                                        <li><a href="register.html">Register</a></li>
-                                        <li><a href="404.html">404</a></li>
-                                    </ul>
-                                </li>
-                                <li><a href="#">Blog</a>
+                                <li><a href="#">후기</a>
                                     <ul>
                                         <li><a href="article.html">Blog Page</a></li>
                                         <li><a href="article-details.html">Blog Details</a></li>
                                     </ul>
                                 </li>
                                 <li><a href="contact.html">Contact</a></li>
-								<li>									
-									<a href="/boot-project-yata/account/login">로그인</a>
-								</li>
-								<li>
-									<a href="/boot-project-yata/account/logout">회원가입</a>									
-								</li>
-							</ul>
+                                
+                                <!-- 비로그인 시 메뉴 -->
+                                <li th:if="${session.loginuser == null}">
+                                    <a href="account/login">로그인</a>
+                                </li>
+                                <li th:if="${session.loginuser == null}">
+                                    <a href="account/register">회원가입</a>
+                                </li>
+                                
+                                <!-- 로그인 시 메뉴 -->
+                                <li th:unless="${session.loginuser == null}">
+                                	<a href="mypage">마이페이지</a>
+                                </li>
+                                <li th:if="${session.loginuser != null and session.loginuser.userType eq 'ADMIN'}">
+                                	<a href="admin/dashboard">관리자페이지</a>
+                                </li>
+                                <li th:unless="${session.loginuser == null}">
+                                    <a href="account/logout">로그아웃</a>
+                                </li>
+                                
+                            </ul>
                         </nav>
                     </div>
                     <!--== Main Menu End ==-->
@@ -164,35 +164,39 @@
                                 <p>YaTa에서 꿈을 이뤄보세요 <br> 최고급 차량들이 당신을 기다리고 있습니다</p>
 
                                 <div class="book-ur-car">
-                                    <form action="index2.html">
+                                    <form action="res" method="post">
                                         <div class="pick-location bookinput-item">
                                             <select class="custom-select">
-                                              <option selected>대여 장소</option>
-                                              <option value="1">서울</option>
-                                              <option value="2">인천</option>
-                                              <option value="3">수원</option>
-                                              <option value="3">안양</option>
+                                                <option selected>대여 장소</option>
+                                                <option value="seoul">서울</option>
+                                                <option value="incheon">인천</option>
+                                                <option value="suwon">수원</option>
+                                                <option value="anyang">안양</option>
                                             </select>
                                         </div>
 
                                         <div class="pick-date bookinput-item">
-                                            <input id="startDate2" placeholder="대여일" />
+                                            <input id="startDate2" name="resStartDate" placeholder="대여일" />
                                         </div>
 
                                         <div class="retern-date bookinput-item">
-                                            <input id="endDate2" placeholder="반납일" />
+                                            <input id="endDate2" name="resEndDate" placeholder="반납일" />
                                         </div>
 
                                         <div class="car-choose bookinput-item">
-                                            <select class="custom-select">
-                                              <option selected>차량 선택</option>
-                                              <option value="1">BMW</option>
-                                              <option value="2">Audi</option>
-                                              <option value="3">Lexus</option>
+                                            <select class="custom-select" name="carNum">
+                                                <option selected>차량 선택</option>
+                                                <option th:value="${ car.carNum }" th:each="car : ${ cars }"
+                                                    th:text="${ car.carType.carClass }"></option>
                                             </select>
                                         </div>
 
                                         <div class="bookcar-btn bookinput-item">
+                                            <input type="hidden" name="userNum" th:if="${session.loginuser != null}" th:value="${session.loginuser.userNum}">
+                                            <input type="hidden" id="total-point" name="totalPoint" th:if="${session.loginuser != null}"
+                                            	th:value="${session.point.totalPoint}">
+                                            <input type="hidden" id="active-point" name="activePoint" th:if="${session.loginuser != null}"
+                                            	th:value="${session.point.activePoint}">
                                             <button type="submit">예약하기</button>
                                         </div>
                                     </form>
@@ -207,10 +211,10 @@
     <!--== SlideshowBg Area End ==-->
 
     <!--== About Us Area Start ==-->
-    <section id="about-area" class="section-padding">
+    <!-- <section id="about-area" class="section-padding">
         <div class="container">
             <div class="row">
-                <!-- Section Title Start -->
+                Section Title Start
                 <div class="col-lg-12">
                     <div class="section-title  text-center">
                         <h2>About us</h2>
@@ -218,68 +222,73 @@
                         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
                     </div>
                 </div>
-                <!-- Section Title End -->
+                Section Title End
             </div>
 
             <div class="row">
-                <!-- About Content Start -->
+                About Content Start
                 <div class="col-lg-6">
                     <div class="display-table">
                         <div class="display-table-cell">
                             <div class="about-content">
-                                <p>Lorem simply dummy is a texted of the printing costed and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type.</p>
+                                <p>Lorem simply dummy is a texted of the printing costed and typesetting industry. Lorem
+                                    Ipsum has been the industry's standard dummy text ever since the 1500s, when an
+                                    unknown printer took a galley of type.</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- About Content End -->
+                About Content End
 
-                <!-- About Video Start -->
+                About Video Start
                 <div class="col-lg-6">
                     <div class="about-image">
                         <img src="assets/img/home-2-about.png" alt="JSOFT">
                     </div>
                 </div>
-                <!-- About Video End -->
+                About Video End
             </div>
 
-            <!-- About Fretutes Start -->
+            About Fretutes Start
             <div class="about-feature-area">
                 <div class="row">
-                    <!-- Single Fretutes Start -->
+                    Single Fretutes Start
                     <div class="col-lg-4">
                         <div class="about-feature-item active">
                             <i class="fa fa-car"></i>
                             <h3>ALL BRANDS</h3>
-                            <p>Loremed ipsumed is a compnayes odsoyel dolor sit amet, consectetur adipisicing elit. Nesciunted all of.</p>
+                            <p>Loremed ipsumed is a compnayes odsoyel dolor sit amet, consectetur adipisicing elit.
+                                Nesciunted all of.</p>
                         </div>
                     </div>
-                    <!-- Single Fretutes End -->
+                    Single Fretutes End
 
-                    <!-- Single Fretutes Start -->
+                    Single Fretutes Start
                     <div class="col-lg-4">
                         <div class="about-feature-item">
                             <i class="fa fa-car"></i>
                             <h3>ALL BRANDS</h3>
-                            <p>Loremed ipsumed is a compnayes odsoyel dolor sit amet, consectetur adipisicing elit. Nesciunted all of.</p>
+                            <p>Loremed ipsumed is a compnayes odsoyel dolor sit amet, consectetur adipisicing elit.
+                                Nesciunted all of.</p>
                         </div>
                     </div>
-                    <!-- Single Fretutes End -->
+                    Single Fretutes End
 
-                    <!-- Single Fretutes Start -->
+                    Single Fretutes Start
                     <div class="col-lg-4">
                         <div class="about-feature-item">
                             <i class="fa fa-car"></i>
                             <h3>ALL BRANDS</h3>
-                            <p>Loremed ipsumed is a compnayes odsoyel dolor sit amet, consectetur adipisicing elit. Nesciunted all of.</p>
+                            <p>Loremed ipsumed is a compnayes odsoyel dolor sit amet, consectetur adipisicing elit.
+                                Nesciunted all of.</p>
                         </div>
                     </div>
-                    <!-- Single Fretutes End -->
+                    Single Fretutes End
                 </div>
             </div>
-            <!-- About Fretutes End -->
+            About Fretutes End
         </div>
-    </section>
+    </section> -->
     <!--== About Us Area End ==-->
 
     <!--== Partner Area Start ==-->
@@ -365,10 +374,10 @@
     <!--== Partner Area End ==-->
 
     <!--== Services Area Start ==-->
-    <section id="service-area" class="section-padding">
+    <!-- <section id="service-area" class="section-padding">
         <div class="container">
             <div class="row">
-                <!-- Section Title Start -->
+                Section Title Start
                 <div class="col-lg-12">
                     <div class="section-title  text-center">
                         <h2>Our Services</h2>
@@ -376,66 +385,66 @@
                         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
                     </div>
                 </div>
-                <!-- Section Title End -->
+                Section Title End
             </div>
 
-			<!-- Service Content Start -->
-			<div class="row">
-				<div class="col-lg-11 m-auto text-center">
-					<div class="service-container-wrap">
-						<!-- Single Service Start -->
-						<div class="service-item">
-							<i class="fa fa-taxi"></i>
-							<h3>RENTAL CAR</h3>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit admollitia.</p>
-						</div>
-						<!-- Single Service End -->
+            Service Content Start
+            <div class="row">
+                <div class="col-lg-11 m-auto text-center">
+                    <div class="service-container-wrap">
+                        Single Service Start
+                        <div class="service-item">
+                            <i class="fa fa-taxi"></i>
+                            <h3>RENTAL CAR</h3>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit admollitia.</p>
+                        </div>
+                        Single Service End
 
-						<!-- Single Service Start -->
-						<div class="service-item">
-							<i class="fa fa-cog"></i>
-							<h3>CAR REPAIR</h3>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit admollitia.</p>
-						</div>
-						<!-- Single Service End -->
+                        Single Service Start
+                        <div class="service-item">
+                            <i class="fa fa-cog"></i>
+                            <h3>CAR REPAIR</h3>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit admollitia.</p>
+                        </div>
+                        Single Service End
 
-						<!-- Single Service Start -->
-						<div class="service-item">
-							<i class="fa fa-map-marker"></i>
-							<h3>TAXI SERVICE</h3>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit admollitia.</p>
-						</div>
-						<!-- Single Service End -->
+                        Single Service Start
+                        <div class="service-item">
+                            <i class="fa fa-map-marker"></i>
+                            <h3>TAXI SERVICE</h3>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit admollitia.</p>
+                        </div>
+                        Single Service End
 
-						<!-- Single Service Start -->
-						<div class="service-item">
-							<i class="fa fa-life-ring"></i>
-							<h3>life insurance</h3>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit admollitia.</p>
-						</div>
-						<!-- Single Service End -->
+                        Single Service Start
+                        <div class="service-item">
+                            <i class="fa fa-life-ring"></i>
+                            <h3>life insurance</h3>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit admollitia.</p>
+                        </div>
+                        Single Service End
 
-						<!-- Single Service Start -->
-						<div class="service-item">
-							<i class="fa fa-bath"></i>
-							<h3>car wash</h3>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit admollitia.</p>
-						</div>
-						<!-- Single Service End -->
+                        Single Service Start
+                        <div class="service-item">
+                            <i class="fa fa-bath"></i>
+                            <h3>car wash</h3>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit admollitia.</p>
+                        </div>
+                        Single Service End
 
-						<!-- Single Service Start -->
-						<div class="service-item">
-							<i class="fa fa-phone"></i>
-							<h3>call driver</h3>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit admollitia.</p>
-						</div>
-						<!-- Single Service End -->
-					</div>
-				</div>
-			</div>
-			<!-- Service Content End -->
+                        Single Service Start
+                        <div class="service-item">
+                            <i class="fa fa-phone"></i>
+                            <h3>call driver</h3>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit admollitia.</p>
+                        </div>
+                        Single Service End
+                    </div>
+                </div>
+            </div>
+            Service Content End
         </div>
-    </section>
+    </section> -->
     <!--== Services Area End ==-->
 
     <!--== Fun Fact Area Start ==-->
@@ -501,7 +510,7 @@
                 <!-- Section Title Start -->
                 <div class="col-lg-12">
                     <div class="section-title  text-center">
-                        <h2>Choose your Car</h2>
+                        <h2>YaTa의 프리미엄 카 리스트</h2>
                         <span class="title-line"><i class="fa fa-car"></i></span>
                         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
                     </div>
@@ -518,11 +527,10 @@
                                 <!-- Choose Filtering Menu Start -->
                                 <div class="home2-car-filter">
                                     <a href="#" data-filter="*" class="active">all</a>
-                                    <a href="#" data-filter=".con">Conver</a>
-                                    <a href="#" data-filter=".hat">Truck</a>
-                                    <a href="#" data-filter=".mpv">MPV</a>
-                                    <a href="#" data-filter=".sedan">Sedan</a>
-                                    <a href="#" data-filter=".suv">SUV</a>
+                                    <a href="#" data-filter=".Bentley">Bentley</a>
+                                    <a href="#" data-filter=".Ferrari">Ferrari</a>
+                                    <a href="#" data-filter=".Lamborghini">Lamborghini</a>
+                                    <a href="#" data-filter=".RollsRoyce">RollsRoyce</a>
                                 </div>
                                 <!-- Choose Filtering Menu End -->
                             </div>
@@ -532,24 +540,26 @@
                                 <div class="row popular-car-gird">
 
                                     <!-- Single Popular Car Start -->
-                                    <div class="col-lg-6 col-md-6 con suv mpv">
+                                    <div th:class="|col-lg-6 col-md-6 ${ car.carType.carMaker }|" th:each="car : ${ cars }">
                                         <div class="single-popular-car">
                                             <div class="p-car-thumbnails">
-                                                <a class="car-hover" href="assets/img/car/car-1.jpg">
-                                                    <img src="assets/img/car/car-1.jpg" alt="JSOFT">
+                                                <a class="car-hover" th:href="@{carPics/} + ${ car.carPhotos[0].carPicture }">
+                                                    <img style="width: 100%;height: 163px" class="car-pic" th:src="@{carPics/} + ${ car.carPhotos[0].carPicture }" alt="YaTa">
                                                 </a>
                                             </div>
 
                                             <div class="p-car-content">
                                                 <h3>
-                                                    <a href="#">Dodge Ram 1500</a>
-                                                    <span class="price"><i class="fa fa-tag"></i> $55/day</span>
+                                                    <a href="#">
+                                                        <span th:text="${ car.carType.carClass }"></span>
+                                                    </a>
+                                                    <span class="price" th:text="|${ car.carPrice }&#8361;/day|"><i class="fa fa-tag"></i></span>
                                                 </h3>
 
-                                                <h5>HATCHBACK</h5>
+                                                <h5>premium</h5>
 
                                                 <div class="p-car-feature">
-                                                    <a href="#">2017</a>
+                                                    <a href="#">2020</a>
                                                     <a href="#">manual</a>
                                                     <a href="#">AIR CONDITION</a>
                                                 </div>
@@ -557,87 +567,7 @@
                                         </div>
                                     </div>
                                     <!-- Single Popular Car End -->
-
-                                    <!-- Single Popular Car Start -->
-                                    <div class="col-lg-6 col-md-6 hat sedan">
-                                        <div class="single-popular-car">
-                                            <div class="p-car-thumbnails">
-                                                <a class="car-hover" href="assets/img/car/car-2.jpg">
-                                                    <img src="assets/img/car/car-2.jpg" alt="JSOFT">
-                                                </a>
-                                            </div>
-
-                                            <div class="p-car-content">
-                                                <h3>
-                                                    <a href="#">Dodge Ram 1500</a>
-                                                    <span class="price"><i class="fa fa-tag"></i> $55/day</span>
-                                                </h3>
-
-                                                <h5>HATCHBACK</h5>
-
-                                                <div class="p-car-feature">
-                                                    <a href="#">2017</a>
-                                                    <a href="#">manual</a>
-                                                    <a href="#">AIR CONDITION</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Single Popular Car End -->
-
-                                    <!-- Single Popular Car Start -->
-                                    <div class="col-lg-6 col-md-6 suv con mpv">
-                                        <div class="single-popular-car">
-                                            <div class="p-car-thumbnails">
-                                                <a class="car-hover" href="assets/img/car/car-3.jpg">
-                                                   <img src="assets/img/car/car-3.jpg" alt="JSOFT">
-                                                </a>
-                                            </div>
-
-                                            <div class="p-car-content">
-                                                <h3>
-                                                    <a href="#">Dodge Ram 1500</a>
-                                                    <span class="price"><i class="fa fa-tag"></i> $55/day</span>
-                                                </h3>
-
-                                                <h5>HATCHBACK</h5>
-
-                                                <div class="p-car-feature">
-                                                    <a href="#">2017</a>
-                                                    <a href="#">manual</a>
-                                                    <a href="#">AIR CONDITION</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Single Popular Car End -->
-
-                                    <!-- Single Popular Car Start -->
-                                    <div class="col-lg-6 col-md-6 con hat">
-                                        <div class="single-popular-car">
-                                            <div class="p-car-thumbnails">
-                                                <a class="car-hover" href="assets/img/car/car-4.jpg">
-                                                    <img src="assets/img/car/car-4.jpg" alt="JSOFT">
-                                                </a>
-                                            </div>
-
-                                            <div class="p-car-content">
-                                                <h3>
-                                                    <a href="#">Dodge Ram 1500</a>
-                                                    <span class="price"><i class="fa fa-tag"></i> $55/day</span>
-                                                </h3>
-
-                                                <h5>HATCHBACK</h5>
-
-                                                <div class="p-car-feature">
-                                                    <a href="#">2017</a>
-                                                    <a href="#">manual</a>
-                                                    <a href="#">AIR CONDITION</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Single Popular Car End -->
+                                    
                                 </div>
                                 <!-- Choose Cars Content-wrap -->
                             </div>
@@ -651,10 +581,10 @@
     <!--== Choose Car Area End ==-->
 
     <!--== Pricing Area Start ==-->
-    <section id="pricing-area" class="section-padding overlay">
+    <!-- <section id="pricing-area" class="section-padding overlay">
         <div class="container">
             <div class="row">
-                <!-- Section Title Start -->
+                Section Title Start
                 <div class="col-lg-12">
                     <div class="section-title  text-center">
                         <h2>Only quality for clients</h2>
@@ -662,12 +592,12 @@
                         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
                     </div>
                 </div>
-                <!-- Section Title End -->
+                Section Title End
             </div>
 
-            <!-- Pricing Table Conatent Start -->
+            Pricing Table Conatent Start
             <div class="row">
-                <!-- Single Pricing Table -->
+                Single Pricing Table
                 <div class="col-lg-4 col-md-6 text-center">
                     <div class="single-pricing-table">
                         <h3>BUSINESS</h3>
@@ -684,9 +614,9 @@
                         </ul>
                     </div>
                 </div>
-                <!-- Single Pricing Table -->
+                Single Pricing Table
 
-                <!-- Single Pricing Table -->
+                Single Pricing Table
                 <div class="col-lg-4 col-md-6 text-center">
                     <div class="single-pricing-table">
                         <h3>Trial</h3>
@@ -703,9 +633,9 @@
                         </ul>
                     </div>
                 </div>
-                <!-- Single Pricing Table -->
+                Single Pricing Table
 
-                <!-- Single Pricing Table -->
+                Single Pricing Table
                 <div class="col-lg-4 col-md-6 text-center">
                     <div class="single-pricing-table">
                         <h3>standard</h3>
@@ -722,18 +652,18 @@
                         </ul>
                     </div>
                 </div>
-                <!-- Single Pricing Table -->
+                Single Pricing Table
             </div>
-            <!-- Pricing Table Conatent End -->
+            Pricing Table Conatent End
         </div>
-    </section>
+    </section> -->
     <!--== Pricing Area End ==-->
 
     <!--== Team Area Start ==-->
-    <section id="team-area" class="section-padding">
+    <!-- <section id="team-area" class="section-padding">
         <div class="container">
             <div class="row">
-                <!-- Section Title Start -->
+                Section Title Start
                 <div class="col-lg-12">
                     <div class="section-title  text-center">
                         <h2>Our Creative Persons</h2>
@@ -741,19 +671,20 @@
                         <p>Lorem ipsum dolor sit amet elit.</p>
                     </div>
                 </div>
-                <!-- Section Title End -->
+                Section Title End
             </div>
 
             <div class="row">
                 <div class="col-lg-12">
                     <div class="team-content">
                         <div class="row">
-                            <!-- Team Tab Menu start -->
+                            Team Tab Menu start
                             <div class="col-lg-4">
                                 <div class="team-tab-menu">
                                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                                         <li class="nav-item">
-                                            <a class="nav-link active" id="tab_item_1" data-toggle="tab" href="#team_member_1" role="tab" aria-selected="true">
+                                            <a class="nav-link active" id="tab_item_1" data-toggle="tab"
+                                                href="#team_member_1" role="tab" aria-selected="true">
                                                 <div class="team-mem-icon">
                                                     <img src="assets/img/team/team-mem-thumb-1.png" alt="JSOFT">
                                                 </div>
@@ -761,7 +692,8 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="tab_item_2" data-toggle="tab" href="#team_member_2" role="tab" aria-selected="true">
+                                            <a class="nav-link" id="tab_item_2" data-toggle="tab" href="#team_member_2"
+                                                role="tab" aria-selected="true">
                                                 <div class="team-mem-icon">
                                                     <img src="assets/img/team/team-mem-thumb-3.png" alt="JSOFT">
                                                 </div>
@@ -769,7 +701,8 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="tab_item_3" data-toggle="tab" href="#team_member_3" role="tab" aria-selected="true">
+                                            <a class="nav-link" id="tab_item_3" data-toggle="tab" href="#team_member_3"
+                                                role="tab" aria-selected="true">
                                                 <div class="team-mem-icon">
                                                     <img src="assets/img/team/team-mem-thumb-2.png" alt="JSOFT">
                                                 </div>
@@ -777,7 +710,8 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="tab_item_4" data-toggle="tab" href="#team_member_4" role="tab" aria-selected="true">
+                                            <a class="nav-link" id="tab_item_4" data-toggle="tab" href="#team_member_4"
+                                                role="tab" aria-selected="true">
                                                 <div class="team-mem-icon">
                                                     <img src="assets/img/team/team-mem-thumb-4.png" alt="JSOFT">
                                                 </div>
@@ -787,13 +721,14 @@
                                     </ul>
                                 </div>
                             </div>
-                            <!-- Team Tab Menu End -->
+                            Team Tab Menu End
 
-                            <!-- Team Tab Content start -->
+                            Team Tab Content start
                             <div class="col-lg-8">
                                 <div class="tab-content" id="myTabContent">
-                                    <!-- Single Team  start -->
-                                    <div class="tab-pane fade show active" id="team_member_1" role="tabpanel" aria-labelledby="tab_item_1">
+                                    Single Team  start
+                                    <div class="tab-pane fade show active" id="team_member_1" role="tabpanel"
+                                        aria-labelledby="tab_item_1">
                                         <div class="row">
                                             <div class="col-lg-6 col-md-6">
                                                 <div class="team-member-pro-pic">
@@ -805,7 +740,9 @@
                                                     <h4>Raju Ahammad</h4>
                                                     <h5>Developer</h5>
                                                     <span class="quote-icon"><i class="fa fa-quote-left"></i></span>
-                                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sollicitudin fermentum dolor. Nunc nec augue urna. Cras varius orci vitae lacinia efficitur.</p>
+                                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+                                                        sollicitudin fermentum dolor. Nunc nec augue urna. Cras varius
+                                                        orci vitae lacinia efficitur.</p>
                                                     <div class="team-social-icon">
                                                         <a href="#"><i class="fa fa-facebook"></i></a>
                                                         <a href="#"><i class="fa fa-twitter"></i></a>
@@ -817,10 +754,11 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- Single Team  End -->
+                                    Single Team  End
 
-                                    <!-- Single Team  start -->
-                                    <div class="tab-pane fade" id="team_member_2" role="tabpanel" aria-labelledby="tab_item_2">
+                                    Single Team  start
+                                    <div class="tab-pane fade" id="team_member_2" role="tabpanel"
+                                        aria-labelledby="tab_item_2">
                                         <div class="row">
                                             <div class="col-lg-6 col-md-6">
                                                 <div class="team-member-pro-pic">
@@ -832,7 +770,9 @@
                                                     <h4>Vongchong Smith</h4>
                                                     <h5>Designer</h5>
                                                     <span class="quote-icon"><i class="fa fa-quote-left"></i></span>
-                                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sollicitudin fermentum dolor. Nunc nec augue urna. Cras varius orci vitae lacinia efficitur.</p>
+                                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+                                                        sollicitudin fermentum dolor. Nunc nec augue urna. Cras varius
+                                                        orci vitae lacinia efficitur.</p>
                                                     <div class="team-social-icon">
                                                         <a href="#"><i class="fa fa-facebook"></i></a>
                                                         <a href="#"><i class="fa fa-twitter"></i></a>
@@ -844,10 +784,11 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- Single Team  End -->
+                                    Single Team  End
 
-                                    <!-- Single Team  start -->
-                                    <div class="tab-pane fade" id="team_member_3" role="tabpanel" aria-labelledby="tab_item_3">
+                                    Single Team  start
+                                    <div class="tab-pane fade" id="team_member_3" role="tabpanel"
+                                        aria-labelledby="tab_item_3">
                                         <div class="row">
                                             <div class="col-lg-6 col-md-6">
                                                 <div class="team-member-pro-pic">
@@ -859,7 +800,9 @@
                                                     <h4>Alex Tuntuni</h4>
                                                     <h5>Marketer</h5>
                                                     <span class="quote-icon"><i class="fa fa-quote-left"></i></span>
-                                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sollicitudin fermentum dolor. Nunc nec augue urna. Cras varius orci vitae lacinia efficitur.</p>
+                                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+                                                        sollicitudin fermentum dolor. Nunc nec augue urna. Cras varius
+                                                        orci vitae lacinia efficitur.</p>
                                                     <div class="team-social-icon">
                                                         <a href="#"><i class="fa fa-facebook"></i></a>
                                                         <a href="#"><i class="fa fa-twitter"></i></a>
@@ -871,10 +814,11 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- Single Team  End -->
+                                    Single Team  End
 
-                                    <!-- Single Team  start -->
-                                    <div class="tab-pane fade" id="team_member_4" role="tabpanel" aria-labelledby="tab_item_4">
+                                    Single Team  start
+                                    <div class="tab-pane fade" id="team_member_4" role="tabpanel"
+                                        aria-labelledby="tab_item_4">
                                         <div class="row">
                                             <div class="col-lg-6 col-md-6">
                                                 <div class="team-member-pro-pic">
@@ -886,7 +830,9 @@
                                                     <h4>Any Anderssen</h4>
                                                     <h5>Manager</h5>
                                                     <span class="quote-icon"><i class="fa fa-quote-left"></i></span>
-                                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sollicitudin fermentum dolor. Nunc nec augue urna. Cras varius orci vitae lacinia efficitur.</p>
+                                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+                                                        sollicitudin fermentum dolor. Nunc nec augue urna. Cras varius
+                                                        orci vitae lacinia efficitur.</p>
                                                     <div class="team-social-icon">
                                                         <a href="#"><i class="fa fa-facebook"></i></a>
                                                         <a href="#"><i class="fa fa-twitter"></i></a>
@@ -898,16 +844,16 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- Single Team  End -->
+                                    Single Team  End
                                 </div>
                             </div>
-                            <!-- Team Tab Content End -->
+                            Team Tab Content End
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
     <!--== Team Area End ==-->
 
     <!--== Mobile App Area Start ==-->
@@ -937,7 +883,7 @@
                 <!-- Section Title Start -->
                 <div class="col-lg-12">
                     <div class="section-title  text-center">
-                        <h2>Tips and articles</h2>
+                        <h2>이용 후기</h2>
                         <span class="title-line"><i class="fa fa-car"></i></span>
                         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
                     </div>
@@ -972,9 +918,12 @@
 
                                             <div class="article-date">25 <span class="month">jan</span></div>
 
-                                            <p>Wlam aiber vestibulum fringilla oremedad ipsum dolor sit amet consectetur adipisicing elit sed doned eiusmod tempored incididunt ut labore et dolore magna aliquaa enimd ad minim veniad.</p>
+                                            <p>Wlam aiber vestibulum fringilla oremedad ipsum dolor sit amet consectetur
+                                                adipisicing elit sed doned eiusmod tempored incididunt ut labore et
+                                                dolore magna aliquaa enimd ad minim veniad.</p>
 
-                                            <a href="article-details.html" class="readmore-btn">Read More <i class="fa fa-long-arrow-right"></i></a>
+                                            <a href="article-details.html" class="readmore-btn">Read More <i
+                                                    class="fa fa-long-arrow-right"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -1003,7 +952,8 @@
                                 <div class="display-table">
                                     <div class="display-table-cell">
                                         <div class="article-body">
-                                            <h3><a href="article-details.html">fringilla oremedad ipsum dolor sit</a></h3>
+                                            <h3><a href="article-details.html">fringilla oremedad ipsum dolor sit</a>
+                                            </h3>
                                             <div class="article-meta">
                                                 <a href="#" class="author">By :: <span>Admin</span></a>
                                                 <a href="#" class="commnet">Comments :: <span>10</span></a>
@@ -1011,9 +961,12 @@
 
                                             <div class="article-date">14<span class="month">feb</span></div>
 
-                                            <p>Wlam aiber vestibulum fringilla oremedad ipsum dolor sit amet consectetur adipisicing elit sed doned eiusmod tempored incididunt ut labore et dolore magna aliquaa enimd ad minim veniad.</p>
+                                            <p>Wlam aiber vestibulum fringilla oremedad ipsum dolor sit amet consectetur
+                                                adipisicing elit sed doned eiusmod tempored incididunt ut labore et
+                                                dolore magna aliquaa enimd ad minim veniad.</p>
 
-                                            <a href="article-details.html" class="readmore-btn">Read More <i class="fa fa-long-arrow-right"></i></a>
+                                            <a href="article-details.html" class="readmore-btn">Read More <i
+                                                    class="fa fa-long-arrow-right"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -1057,9 +1010,12 @@
 
                                             <div class="article-date">17 <span class="month">feb</span></div>
 
-                                            <p>Wlam aiber vestibulum fringilla oremedad ipsum dolor sit amet consectetur adipisicing elit sed doned eiusmod tempored incididunt ut labore et dolore magna aliquaa enimd ad minim veniad.</p>
+                                            <p>Wlam aiber vestibulum fringilla oremedad ipsum dolor sit amet consectetur
+                                                adipisicing elit sed doned eiusmod tempored incididunt ut labore et
+                                                dolore magna aliquaa enimd ad minim veniad.</p>
 
-                                            <a href="article-details.html" class="readmore-btn">Read More <i class="fa fa-long-arrow-right"></i></a>
+                                            <a href="article-details.html" class="readmore-btn">Read More <i
+                                                    class="fa fa-long-arrow-right"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -1087,7 +1043,8 @@
                             <h2>About Us</h2>
                             <div class="widget-body">
                                 <img src="assets/img/logo.png" alt="JSOFT">
-                                <p>Lorem ipsum dolored is a sit ameted consectetur adipisicing elit. Nobis magni assumenda distinctio debitis, eum fuga fugiat error reiciendis.</p>
+                                <p>Lorem ipsum dolored is a sit ameted consectetur adipisicing elit. Nobis magni
+                                    assumenda distinctio debitis, eum fuga fugiat error reiciendis.</p>
 
                                 <div class="newsletter-area">
                                     <form action="index.html">
@@ -1109,27 +1066,27 @@
                                 <ul class="recent-post">
                                     <li>
                                         <a href="#">
-                                           Hello Bangladesh! 
-                                           <i class="fa fa-long-arrow-right"></i>
-                                       </a>
+                                            Hello Bangladesh!
+                                            <i class="fa fa-long-arrow-right"></i>
+                                        </a>
                                     </li>
                                     <li>
                                         <a href="#">
-                                          Lorem ipsum dolor sit amet
-                                           <i class="fa fa-long-arrow-right"></i>
-                                       </a>
+                                            Lorem ipsum dolor sit amet
+                                            <i class="fa fa-long-arrow-right"></i>
+                                        </a>
                                     </li>
                                     <li>
                                         <a href="#">
-                                           Hello Bangladesh! 
-                                           <i class="fa fa-long-arrow-right"></i>
-                                       </a>
+                                            Hello Bangladesh!
+                                            <i class="fa fa-long-arrow-right"></i>
+                                        </a>
                                     </li>
                                     <li>
                                         <a href="#">
                                             consectetur adipisicing elit?
-                                           <i class="fa fa-long-arrow-right"></i>
-                                       </a>
+                                            <i class="fa fa-long-arrow-right"></i>
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
@@ -1142,14 +1099,16 @@
                         <div class="single-footer-widget">
                             <h2>get touch</h2>
                             <div class="widget-body">
-                                <p>Lorem ipsum doloer sited amet, consectetur adipisicing elit. nibh auguea, scelerisque sed</p>
+                                <p>Lorem ipsum doloer sited amet, consectetur adipisicing elit. nibh auguea, scelerisque
+                                    sed</p>
 
                                 <ul class="get-touch">
                                     <li><i class="fa fa-map-marker"></i> 800/8, Kazipara, Dhaka</li>
                                     <li><i class="fa fa-mobile"></i> +880 01 86 25 72 43</li>
                                     <li><i class="fa fa-envelope"></i> kazukamdu83@gmail.com</li>
                                 </ul>
-                                <a href="https://goo.gl/maps/b5mt45MCaPB2" class="map-show" target="_blank">Show Location</a>
+                                <a href="https://goo.gl/maps/b5mt45MCaPB2" class="map-show" target="_blank">Show
+                                    Location</a>
                             </div>
                         </div>
                     </div>
@@ -1164,9 +1123,14 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12 text-center">
-                        <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+                        <p>
+                            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                            Copyright &copy;
+                            <script>document.write(new Date().getFullYear());</script> All rights reserved | This
+                            template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a
+                                href="https://colorlib.com" target="_blank">Colorlib</a>
+                            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                        </p>
                     </div>
                 </div>
             </div>
@@ -1211,6 +1175,11 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 
     <!--=== Mian Js ===-->
     <script src="assets/js/main.js"></script>
+    
+    <script type="text/javascript">
+    	$(function() {
+    	});
+    </script>
 
 </body>
 

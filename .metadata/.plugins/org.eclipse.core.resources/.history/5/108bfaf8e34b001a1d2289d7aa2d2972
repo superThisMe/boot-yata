@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+		   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yata.mapper.ReserveMapper">
+
+<resultMap type="com.yata.vo.ReserveVO" id="ReserveMap">
+		<id column="res_num" property="resNum" />
+		<result column="user_num" property="userNum" />
+		<result column="car_num" property="carNum" />	
+		<result column="res_term" property="resTerm" />
+		<result column="res_price" property="resPrice" />
+		<result column="res_date" property="resDate" />
+		<result column="res_cancel" property="resCancel" />
+		<association column="car_num" property="car" resultMap="CarMap" />
+		<association column="user_num" property="member" resultMap="memberMap" />	
+	</resultMap>
+	<resultMap type="com.yata.vo.CarVO" id="CarMap">
+		<id column="car_num" property="carNum" />
+		<result column="car_fuel" property="carFuel" />
+		<result column="car_manual" property="carManual" />
+		<result column="car_content" property="carContent" />
+		<result column="car_price" property="carPrice" />
+		<result column="car_date" property="carDate" />
+	</resultMap>
+	<resultMap type="com.yata.vo.MemberVO" id="memberMap" >
+		<id column="user_num" property="userNum" />
+		<result column="user_email" property="userEmail" />
+		<result column="user_photo" property="userPhoto" />
+		<result column="user_Name" property="userName" />
+		<result column="user_passwd" property="userPasswd" />
+		<result column="user_postcode" property="userPostcode" />
+		<result column="user_addr" property="userAddr" />
+		<result column="user_detailAddr" property="userDetailaddr" />
+		<result column="user_refAddr" property="userRefaddr" />
+		<result column="user_birth" property="userBirth" />
+		<result column="user_phone" property="userPhone" />
+		<result column="user_regDate" property="userRegdate" />
+		<result column="user_driveNum" property="userDrivenum" />
+		<result column="user_key" property="userKey" />
+		<result column="user_driveNum" property="userDrivenum" />		
+		<result column="deleted" property="deleted" />		
+		<result column="user_active" property="userActive" />	
+	</resultMap>
+	<resultMap type="com.yata.vo.ReturnVO" id="returnMap">
+		<id column="res_num" property="resNum" />
+		<result column="res_cancel" property="resCancel" />
+		<result column="realtime" property="realtime" />
+		<result column="accept" property="accept" />
+		<result column="revaccept" property="revaccept" />
+		<result column="inner" property="inner" />
+		<result column="outer" property="outer" />
+	</resultMap>
+	
+	
+	<insert id="insertReserve" parameterType="com.yata.vo.ReserveVO" useGeneratedKeys="true" keyColumn="res_num" keyProperty="resNum">
+		INSERT INTO
+		reserve (res_num, user_num, car_num, res_date, res_term, res_price)
+		VALUES (RESNUM_SEQUENCE.NEXTVAL, #{userNum}, #{carNum}, #{resDate}, #{resTerm}, #{resPrice})
+	</insert>
+			
+	<select id="findReserveByUser_num" resultMap="ReserveMap" parameterType="int">
+		SELECT r.res_num, c.car_num, m.user_num, r.res_term, r.res_price, r.res_date, r.res_cancel
+		FROM reserve r
+		INNER JOIN car c 
+		ON r.car_num = c.car_num		
+		INNER JOIN tbl_user m
+		ON r.user_num = m.user_num	
+        where r.user_num = #{ userNum }
+	</select>
+
+	<select id="findReserves" resultMap="ReserveMap" parameterType="com.yata.vo.ReserveVO">
+		SELECT r.res_num, c.car_num, m.user_num, r.res_date, r.res_term, r.res_price, r.res_cancel,
+			c.car_fuel, c.car_manual, c.car_content, c.car_price, c.car_date,
+			m.user_photo, m.user_email, m.user_name, m.user_birth, m.user_phone, m.user_postcode, m.user_addr, m.user_detailaddr, m.user_refaddr, m.user_regdate, m.user_drivenum
+		FROM reserve r 
+		INNER JOIN car c 
+		ON r.car_num = c.car_num		
+		INNER JOIN tbl_user m
+		ON r.user_num = m.user_num
+	</select>
+	
+	<insert id="returnCar" parameterType="com.yata.vo.ReturnVO">
+		INSERT INTO 
+		return (res_num, res_cancel ) 
+		VALUES (#{resNum}, '1' )
+	</insert>
+	
+	<select id="selectNotReturnHistory" parameterType="int" resultType="int">
+		SELECT COUNT(*)
+		from reserve
+		WHERE user_num = #{ user_num }
+		AND
+		res_num NOT IN (SELECT res_num FROM RETURN WHERE user_num = #{ user_num })
+	</select>
+
+	<update id="returnCar2" parameterType="int">
+		UPDATE reserve 
+		SET res_cancel = '1' 
+		WHERE res_num = #{ res_num }
+	</update>
+	
+	<select id="selectReturnList" resultType="ReturnVO">
+		SELECT res_num, res_cancel, realtime, accept, revaccept, inner, outer
+		FROM return
+	</select>
+	
+	<update id="updateResAccept" parameterType="int">
+		UPDATE return 
+		SET accept = '1' 
+		WHERE res_num = #{ res_num }
+	</update>
+
+	<select id="selectAllReserves" resultType="int">
+		SELECT COUNT(*)
+		FROM reserve
+	</select>
+	
+</mapper>

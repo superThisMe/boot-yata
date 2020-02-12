@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+		   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- package-name : com.springboard.mapper, class-name : BoardMapper -->
+<mapper namespace="com.yata.mapper.MemberMapper">
+
+	<!-- 회원가입 -->
+	<insert id="insertMember" parameterType="com.yata.vo.MemberVO" useGeneratedKeys="true" keyColumn="user_num" keyProperty="userNum">
+		INSERT INTO tbl_user 
+		(
+			user_num, user_photo, user_email, user_passwd, user_Name, user_birth, user_phone,
+			user_postcode, user_addr, user_detailAddr, user_refAddr, user_driveNum, user_key
+		) 
+		VALUES
+		(
+			usernum_sequence.nextval, #{userPhoto}, #{userEmail}, #{userPasswd}, #{userName}, #{userBirth}, #{userPhone},
+			#{userPostcode}, #{userAddr}, #{userDetailaddr}, #{userRefaddr}, #{userDrivenum}, #{userKey}
+		)
+	</insert>
+	
+	<!-- 회원가입 시 기본포인트(1,000,000점) 부여 -->
+	<insert id="insertPoint" parameterType="com.yata.vo.PointVO">
+		INSERT INTO tbl_point (user_num, active_point, total_point, change_point)
+		VALUES (#{userNum}, 1000000, 1000000, 1000000)
+	</insert>
+	
+	<!-- 회원 포인트 부여 후 등급 업데이트 -->
+	<update id="updatePoint" parameterType="com.yata.vo.MemberVO">
+		update tbl_point
+		set total_point = #{point.totalPoint}, active_point = #{point.activePoint}, user_grade = #{point.userGrade}
+		where user_num = #{userNum}
+	</update>
+	
+	<update id="updateActivePoint" parameterType="hashMap">
+		update tbl_point
+		set active_point = #{param2}
+		where user_num = #{param1}
+	</update>
+	
+	<update id="approval_member" parameterType="com.yata.vo.MemberVO">
+		update tbl_user
+		set user_active = '1'
+		where user_email = #{userEmail} 
+		and user_key = #{userKey}
+	</update>
+	
+	
+	<resultMap type="com.yata.vo.MemberVO" id="MemberMap">
+		<id column="user_num" property="userNum" />
+		<result column="user_photo" property="userPhoto" />
+		<result column="user_email" property="userEmail" />
+		<result column="user_passwd" property="userPasswd" />
+		<result column="user_birth" property="userBirth" />
+		<result column="user_phone" property="userPhone" />
+		<result column="user_postcode" property="userPostcode" />
+		<result column="user_addr" property="userAddr" />
+		<result column="user_detailaddr" property="userDetailaddr" />
+		<result column="user_refaddr" property="userRefaddr" />
+		<result column="user_regdate" property="userRegdate" />
+		<result column="user_type" property="userType" />
+		<result column="user_drivenum" property="userDrivenum" />
+		<result column="user_active" property="userActive" />		
+		<result column="user_key" property="userKey" />
+		<association column="user_num" property="point" resultMap="pointMap" />
+	</resultMap>
+	<resultMap type="com.yata.vo.PointVO" id="pointMap" >
+		<id column="user_num" property="userNum" />
+		<result column="user_grade" property="userGrade" />
+		<result column="point_date" property="pointDate" />
+		<result column="total_point" property="totalPoint" />
+		<result column="active_point" property="activePoint" />
+		<result column="change_point" property="changePoint" />
+	</resultMap>
+			
+	<select id="findMember" resultMap="MemberMap" parameterType="com.yata.vo.MemberVO">
+		SELECT p.user_num, m.user_email, m.user_name, m.user_birth, m.user_phone, m.user_regdate ,m.user_drivenum, m.user_type,
+			p.user_grade, p.point_date, p.total_point, p.active_point, p.change_point
+		FROM tbl_user m 
+		LEFT OUTER JOIN tbl_point p
+		ON m.user_num = p.user_num 
+		WHERE m.user_active = '1'
+	</select>
+	
+	<select id="selectMemberByEmailAndPasswd" parameterType="com.yata.vo.MemberVO" resultMap="MemberMap">
+		SELECT p.user_num, m.user_photo, m.user_email, m.user_passwd, m.user_Name, m.user_birth, m.user_phone, m.user_postcode, m.user_addr, m.user_detailAddr, m.user_refAddr, m.user_driveNum, m.user_type, m.user_active, m.user_regDate, p.total_point, p.active_point, p.point_date , p.user_grade
+		FROM tbl_user m
+		INNER JOIN tbl_point p
+		ON m.user_num = p.user_num 
+	    WHERE m.user_email = #{ userEmail } AND m.user_passwd = #{ userPasswd }
+	</select> 
+	
+	<update id="deleteUser" parameterType="com.yata.vo.MemberVO">
+		update tbl_user
+		set deleted = '1'
+		where user_passwd = #{ userPasswd }
+	</update>
+
+	<select id="findEmail" parameterType="com.yata.vo.MemberVO" resultType="com.yata.vo.MemberVO">
+		SELECT user_email, user_phone
+		FROM tbl_user
+		WHERE user_email = #{ userEmail }
+	</select>
+	
+	<select id="findPhone" parameterType="com.yata.vo.MemberVO" resultType="com.yata.vo.MemberVO">
+		SELECT user_email, user_phone
+		FROM tbl_user
+		WHERE user_phone = #{ userPhone }
+	</select>
+	
+	<update id="updatePasswd" parameterType="com.yata.vo.MemberVO">
+		UPDATE tbl_user
+		SET user_passwd = #{ user_passwd }
+		WHERE user_email = #{ userEmail } AND user_phone = #{ userPhone }
+	</update>
+		
+	<select id="selectAllMember" resultType="int">
+		SELECT COUNT(*)
+		FROM tbl_user
+	</select>
+		
+</mapper>

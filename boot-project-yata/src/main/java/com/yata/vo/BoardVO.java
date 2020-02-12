@@ -11,8 +11,8 @@ public class BoardVO {
 	private String brdTitle;
 	private String brdWriter;
 	private String brdContent;
-	private Date brdRegDate;
-	private int brdReadCount;
+	private Date brdRegdate;
+	private int brdReadcount;
 	private boolean brdDel;
 	private int userNum;
 

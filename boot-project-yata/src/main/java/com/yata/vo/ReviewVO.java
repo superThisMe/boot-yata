@@ -13,7 +13,7 @@ public class ReviewVO {
 	private int resNum;
 	private String revTitle;
 	private String revWriter;
-	private Date revRegDate;
+	private Date revRegdate;
 	private String revContent;
 	private int revGrade;
 	private String revPhoto;

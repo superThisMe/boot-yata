@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+		   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yata.mapper.BoardMapper">
+	
+	<insert id="insertBoard" parameterType="com.yata.vo.BoardVO">
+		INSERT INTO board (brd_num, brd_title, user_num, brd_writer, brd_content)
+		VALUES (brd_sequence.nextval, #{brdTitle}, #{userNum}, #{brdWriter}, #{brdContent})
+	</insert>
+	
+	<select id="showList" resultType="com.yata.vo.BoardVO">
+		SELECT brd_num, brd_title, brd_writer, brd_regDate
+		FROM board
+		WHERE brd_del = '0'
+		ORDER BY brd_num DESC
+	</select>
+	
+	<select id="selectBoardByBrd_num" parameterType="int" resultType="com.yata.vo.BoardVO">
+		SELECT brd_num, brd_title, brd_writer, brd_content, brd_regdate
+		FROM board
+		WHERE brd_num = #{ brdNum } AND brd_del = '0'
+	</select>
+	
+	<delete id="deleteBoard" parameterType="int">
+		DELETE FROM board 
+		WHERE brd_num = #{ brdNum }
+	</delete>
+	
+	<update id="updateBoard" parameterType="com.yata.vo.BoardVO">
+		UPDATE board
+		SET brd_title = #{ brdTitle }, brd_content = #{ brdContent } 
+		WHERE brd_num = #{ brdNum }
+	</update>
+	
+	<resultMap type="com.yata.vo.ReviewVO" id="ReviewMap">
+		<id column="rev_num" property="revNum" />
+		<result column="user_num" property="userNum" />
+		<result column="car_num" property="carNum" />	
+		<result column="res_num" property="resNum" />
+		<result column="rev_title" property="revTitle" />
+		<result column="rev_writer" property="revWriter" />
+		<result column="rev_regDate" property="revRegDate" />
+		<result column="rev_content" property="revContent" />
+		<result column="rev_grade" property="revGrade" />
+		<result column="rev_photo" property="revPhoto" />
+		<result column="rev_del" property="revDel" />
+		<result column="rev_cancel" property="revCancel" />
+		<association column="car_num" property="car" resultMap="CarMap" />
+	</resultMap>
+	<resultMap type="com.yata.vo.CarVO" id="CarMap">
+		<id column="car_num" property="carNum" />
+		<result column="car_fuel" property="carFuel" />
+		<result column="car_manual" property="carManual" />
+		<result column="car_content" property="carContent" />
+		<result column="car_price" property="carPrice" />
+		<result column="car_date" property="carDate" />
+		<association column="car_num" property="carType" resultMap="carTypeMap" />
+	</resultMap>
+	<resultMap type="com.yata.vo.CarTypeVO" id="carTypeMap">
+		<id column="car_num" property="car_num" />
+		<result column="car_maker" property="car_maker" />
+		<result column="car_class" property="car_class" />
+	</resultMap>
+	
+	<select id="reviewList" resultType="com.yata.vo.ReviewVO" resultMap="ReviewMap">
+		SELECT r.rev_num, r.rev_title, r.rev_writer, r.rev_regDate, t.car_class, t.car_maker, r.rev_grade
+		FROM review r, car c, car_type t 
+		WHERE r.car_num = c.car_num 
+		AND c.car_num = t.car_num
+		
+	</select> 
+	
+	<select id="reviewDetail" parameterType="int" resultType="com.yata.vo.ReviewVO">
+		SELECT * 
+		FROM review
+		WHERE rev_num = #{ rev_num } 
+	
+	</select>
+
+
+</mapper>

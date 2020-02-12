@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+		   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yata.mapper.ReviewMapper">
+
+	<insert id="writeReview" parameterType="com.yata.vo.ReviewVO" useGeneratedKeys="true" keyColumn="user_num" keyProperty="userNum">
+		INSERT INTO review 
+		(
+			rev_num, user_num, car_num , res_num , rev_title,
+			rev_content, rev_grade, rev_photo , rev_writer
+		)
+		VALUES
+		(
+			REVIEW_SEQUENCE.NEXTVAL, #{userNum}, #{carNum} , #{resNum}, #{revTitle},
+			#{revContent}, #{revGrade}, #{revPhoto}, #{revWriter}
+		)
+	</insert>	
+	
+	<resultMap type="com.yata.vo.ReviewVO" id="reviewMap">
+		<id column="rev_num" property="revNum" />
+		<result column="car_num" property="carNum" />
+		<result column="res_num" property="resNum" />
+		<result column="user_num" property="userNum" />
+		<result column="rev_title" property="revTitle" />
+		<result column="rev_writer" property="revWriter" />
+		<result column="rev_regDate" property="revRegdate" />
+		<result column="rev_content" property="revContent" />
+		<result column="rev_grade" property="revGrade" />
+		<result column="rev_photo" property="revPhoto" />
+		<result column="rev_del" property="revDel" />
+		<result column="rev_cancel" property="revCancel" />
+	</resultMap>
+	
+	<resultMap type="com.yata.vo.CarVO" id="carMap">
+		<id column="car_num" property="carNum" />
+		<result column="car_fuel" property="carFuel" />
+		<result column="car_manual" property="carManual" />
+		<result column="car_content" property="carContent" />
+		<result column="car_price" property="carPrice" />
+		<result column="car_date" property="carDate" />
+		<association property="carType" select="findCarTypeByCarNum" column="car_num" />
+	</resultMap>
+	
+	<resultMap type="CarTypeVO" id="carTypeMap">
+		<id column="car_num" property="car_num" />
+		<result column="car_maker" property="car_maker" />
+		<result column="car_class" property="car_class" />
+	</resultMap>
+	
+	<select id="findReviewByUserNum" resultMap="reviewMap" parameterType="int">
+		SELECT w.rev_num, w.user_num, w.car_num , w.res_num , w.rev_title, w.rev_writer, w.rev_content, w.rev_grade, w.rev_regdate 
+		FROM review w
+		where w.user_num = #{ user_num }
+	</select>
+	<select id="findCarByCar_num" resultMap="carMap" parameterType="int">
+		SELECT c.car_num, c.car_fuel, c.car_manual, c.car_content, c.car_price, c.car_date 
+		FROM Car c		
+		where c.car_num = #{ car_num }
+	</select>
+	<select id="findCarTypeByCarNum" resultMap="carTypeMap" parameterType="int">
+		SELECT t.car_num, t.car_maker, t.car_class
+		FROM Car_Type t
+		where t.car_num = #{ car_num }
+	</select>
+	
+	<select id="selectAllReviews" resultType="int">
+		SELECT COUNT(*)
+		FROM review
+	</select>
+	
+</mapper>

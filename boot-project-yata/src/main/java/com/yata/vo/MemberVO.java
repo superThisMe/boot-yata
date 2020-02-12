@@ -17,14 +17,16 @@ public class MemberVO {
 	private String userPhone;
 	private String userPostcode;
 	private String userAddr;
-	private String userDetailAddr;
-	private String userRefAddr;	
-	private Date userRegDate;
+	private String userDetailaddr;
+	private String userRefaddr;	
+	private Date userRegdate;
 	private String userType;
-	private String userDriveNum;
+	private String userDrivenum;
 	private boolean userActive;
 	private String userKey;
 	private boolean deleted;
+	private String userGrade;
+	
 	private List<PointVO> points;
 	
 }

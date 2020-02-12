@@ -4,8 +4,16 @@
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="isRegEx" value="false"/>
+		<item key="selection" value="About"/>
 		<list key="findhistory">
-			<item value="HOME"/>
+			<item value="choose your"/>
+			<item value="service"/>
+			<item value="about"/>
+			<item value="대여 장소"/>
+			<item value="대여장소"/>
+			<item value="updateActivePoint"/>
+			<item value="total"/>
+			<item value="SEQUENce"/>
 		</list>
 		<list key="replacehistory">
 		</list>
